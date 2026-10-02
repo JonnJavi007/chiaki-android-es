@@ -15,6 +15,7 @@ extern "C" {
 #ifdef CHIAKI_LIB_ENABLE_MBEDTLS
 #include "mbedtls/ecdh.h"
 #include "mbedtls/ctr_drbg.h"
+#include "mbedtls/entropy.h"
 #endif
 
 
@@ -27,9 +28,16 @@ typedef struct chiaki_ecdh_t
 // globally (whole project)
 #ifdef CHIAKI_LIB_ENABLE_MBEDTLS
 	// mbedtls ecdh context
-	mbedtls_ecdh_context ctx;
+	struct {
+		mbedtls_ecp_group grp;
+		mbedtls_mpi d;
+		mbedtls_ecp_point Q;
+		mbedtls_ecp_point Qp;
+		mbedtls_mpi z;
+	} ctx;
 	// deterministic random bit generator
 	mbedtls_ctr_drbg_context drbg;
+	mbedtls_entropy_context entropy;
 #else
 	struct ec_group_st *group;
 	struct ec_key_st *key_local;
