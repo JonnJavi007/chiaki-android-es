@@ -30,18 +30,21 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_ecdh_init(ChiakiECDH *ecdh)
 	// mbedtls ecdh example:
 	// https://github.com/ARMmbed/mbedtls/blob/development/programs/pkey/ecdh_curve25519.c
 	const char pers[] = "ecdh";
-	mbedtls_entropy_context entropy;
 	//init RNG Seed context
-	mbedtls_entropy_init(&entropy);
+	mbedtls_entropy_init(&ecdh->entropy);
 	// init local key
 	//mbedtls_ecp_keypair_init(&ecdh->key_local);
-	mbedtls_ecdh_init(&ecdh->ctx);
+	mbedtls_ecp_group_init(&ecdh->ctx.grp);
+	mbedtls_mpi_init(&ecdh->ctx.d);
+	mbedtls_ecp_point_init(&ecdh->ctx.Q);
+	mbedtls_ecp_point_init(&ecdh->ctx.Qp);
+	mbedtls_mpi_init(&ecdh->ctx.z);
 	// init ecdh group
 	// keep rng context in ecdh for later reuse
 	mbedtls_ctr_drbg_init(&ecdh->drbg);
 
 	// build RNG seed
-	CHECK(mbedtls_ctr_drbg_seed(&ecdh->drbg, mbedtls_entropy_func, &entropy,
+	CHECK(mbedtls_ctr_drbg_seed(&ecdh->drbg, mbedtls_entropy_func, &ecdh->entropy,
 		(const unsigned char *) pers, sizeof pers));
 
 	// build MBEDTLS_ECP_DP_SECP256K1 group
@@ -50,8 +53,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_ecdh_init(ChiakiECDH *ecdh)
 	CHECK(mbedtls_ecdh_gen_public(&ecdh->ctx.grp, &ecdh->ctx.d,
 		&ecdh->ctx.Q, mbedtls_ctr_drbg_random, &ecdh->drbg));
 
-	// relese entropy ptr
-	mbedtls_entropy_free(&entropy);
+	// Entropy must remain alive while the DRBG retains its callback.
 #undef CHECK
 
 #else
@@ -71,8 +73,13 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_ecdh_init(ChiakiECDH *ecdh)
 CHIAKI_EXPORT void chiaki_ecdh_fini(ChiakiECDH *ecdh)
 {
 #ifdef CHIAKI_LIB_ENABLE_MBEDTLS
-	mbedtls_ecdh_free(&ecdh->ctx);
+	mbedtls_ecp_group_free(&ecdh->ctx.grp);
+	mbedtls_mpi_free(&ecdh->ctx.d);
+	mbedtls_ecp_point_free(&ecdh->ctx.Q);
+	mbedtls_ecp_point_free(&ecdh->ctx.Qp);
+	mbedtls_mpi_free(&ecdh->ctx.z);
 	mbedtls_ctr_drbg_free(&ecdh->drbg);
+	mbedtls_entropy_free(&ecdh->entropy);
 #else
 	EC_KEY_free(ecdh->key_local);
 	EC_GROUP_free(ecdh->group);
@@ -97,8 +104,10 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_ecdh_set_local_key(ChiakiECDH *ecdh, const 
 	if(r != 0)
 		return CHIAKI_ERR_UNKNOWN;
 
-	// regen key
-	r = mbedtls_ecdh_gen_public(&ecdh->ctx.grp, &ecdh->ctx.d, &ecdh->ctx.Q, mbedtls_ctr_drbg_random, &ecdh->drbg);
+	r = mbedtls_ecp_check_privkey(&ecdh->ctx.grp, &ecdh->ctx.d);
+	if(r != 0)
+		return CHIAKI_ERR_UNKNOWN;
+	r = mbedtls_ecp_check_pubkey(&ecdh->ctx.grp, &ecdh->ctx.Q);
 	if(r != 0)
 		return CHIAKI_ERR_UNKNOWN;
 
@@ -199,7 +208,6 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_ecdh_derive_secret(ChiakiECDH *ecdh, uint8_
 		goto error;} \
 	} while(0)
 
-	GOTO_ERROR(mbedtls_mpi_lset(&ecdh->ctx.Qp.Z, 1));
 	// load Qp point form remote PK
 	GOTO_ERROR(mbedtls_ecp_point_read_binary(&ecdh->ctx.grp,
 		&ecdh->ctx.Qp, remote_key, remote_key_size));
