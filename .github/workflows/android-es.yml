@@ -1,0 +1,79 @@
+name: Chiaki Espanol APK
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Require translated sources
+        run: grep -q 'com.metallic.chiaki.es' android/app/build.gradle
+      - name: Toolchain
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake protobuf-compiler python3-venv
+          python3 -m venv "$RUNNER_TEMP/python"
+          "$RUNNER_TEMP/python/bin/pip" install protobuf==3.20.3 setuptools==70.3.0
+          echo "$RUNNER_TEMP/python/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-33' 'build-tools;33.0.2' 'ndk;25.2.9519653' 'cmake;3.22.1'
+      - name: Pinned dependency sources
+        run: |
+          set -euo pipefail
+          fetch_source() {
+            git clone --no-checkout "$1" "$2"
+            git -C "$2" checkout --detach "$3"
+            test "$(git -C "$2" rev-parse HEAD)" = "$3"
+          }
+          fetch_source https://github.com/nanopb/nanopb.git third-party/nanopb afc499f9a410fc9bbf6c9c48cdd8d8b199d49eb4
+          fetch_source https://git.sr.ht/~thestr4ng3r/jerasure third-party/jerasure 505ccb4bc69eee8d7ea40a6089a056b99671134f
+          fetch_source https://git.sr.ht/~thestr4ng3r/gf-complete third-party/gf-complete fa54a4670a5705c84abf6c24b92b0cd479625478
+          fetch_source https://github.com/nemequ/munit.git test/munit 439de4a9b136bc3b5163e73d4caf37c590bef875
+          curl -fL https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2 -o "$RUNNER_TEMP/mbedtls.tar.bz2"
+          echo "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6  $RUNNER_TEMP/mbedtls.tar.bz2" | sha256sum -c -
+          mkdir third-party/mbedtls
+          tar -xjf "$RUNNER_TEMP/mbedtls.tar.bz2" --strip-components=1 -C third-party/mbedtls
+      - name: Native unit tests
+        run: |
+          set -euo pipefail
+          cmake -S . -B "$RUNNER_TEMP/native" -G Ninja -DCHIAKI_ENABLE_GUI=OFF -DCHIAKI_ENABLE_CLI=OFF -DCHIAKI_ENABLE_SETSU=OFF -DCHIAKI_ENABLE_FFMPEG_DECODER=OFF -DCHIAKI_ENABLE_PI_DECODER=OFF -DCHIAKI_LIB_ENABLE_OPUS=OFF -DCHIAKI_LIB_ENABLE_MBEDTLS=ON -DCHIAKI_LIB_MBEDTLS_EXTERNAL_PROJECT=ON -DCHIAKI_ENABLE_TESTS=ON
+          cmake --build "$RUNNER_TEMP/native" --parallel 2
+          ctest --test-dir "$RUNNER_TEMP/native" --output-on-failure | tee "$RUNNER_TEMP/native-tests.txt"
+      - name: Verified Gradle wrapper
+        run: |
+          curl -fL https://raw.githubusercontent.com/gradle/gradle/v7.6.0/gradle/wrapper/gradle-wrapper.jar -o android/gradle/wrapper/gradle-wrapper.jar
+          echo 'c5a643cf80162e665cc228f7b16f343fef868e47d3a4836f62e18b7e17ac018a  android/gradle/wrapper/gradle-wrapper.jar' | sha256sum -c -
+          chmod +x android/gradlew
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" > android/local.properties
+      - name: Build APK and lint
+        working-directory: android
+        run: ./gradlew --no-daemon --console=plain --max-workers=2 assembleRelease lintRelease
+      - name: Sign and verify APK
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/release"
+          mkdir -p "$out"
+          export SIGN_PASSWORD="$(openssl rand -hex 24)"
+          keytool -genkeypair -keystore "$RUNNER_TEMP/release.jks" -storepass:env SIGN_PASSWORD -keypass:env SIGN_PASSWORD -alias chiaki-es -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Chiaki Espanol'
+          bt="$ANDROID_HOME/build-tools/33.0.2"
+          "$bt/zipalign" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$out/aligned.apk"
+          "$bt/apksigner" sign --ks "$RUNNER_TEMP/release.jks" --ks-key-alias chiaki-es --ks-pass env:SIGN_PASSWORD --key-pass env:SIGN_PASSWORD --out "$out/chiaki-es-fire-tv.apk" "$out/aligned.apk"
+          "$bt/apksigner" verify --verbose --print-certs "$out/chiaki-es-fire-tv.apk" | tee "$out/apk-verification.txt"
+          "$bt/aapt" dump badging "$out/chiaki-es-fire-tv.apk" | tee "$out/apk-metadata.txt"
+          cp "$RUNNER_TEMP/native-tests.txt" "$out/"
+          cp android/app/build/reports/lint-results-release.html "$out/"
+          rm "$out/aligned.apk"
+          tar --exclude='.git' --exclude='./android/app/build' --exclude='./android/app/.cxx' --exclude='./android/.gradle' --exclude='./android/local.properties' -czf "$out/chiaki-es-source.tar.gz" .
+          cd "$out"
+          sha256sum chiaki-es-fire-tv.apk chiaki-es-source.tar.gz > SHA256SUMS.txt
+      - name: Publish download
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "es-20261002-$GITHUB_RUN_NUMBER" "$RUNNER_TEMP/release/"* --target "$GITHUB_SHA" --title 'Chiaki Espanol para Android y Fire TV' --notes 'APK ARM de 32 y 64 bits. Menus en espanol y copias de seguridad automaticas desactivadas. Pruebas nativas, lint y firma verificados en esta compilacion; no probado en un Fire TV fisico. Compatible con Fire OS basado en Android, no con Vega OS. Incluye codigo fuente completo y SHA256. La clave de firma es especifica de esta compilacion; otras compilaciones pueden requerir reinstalar.'
