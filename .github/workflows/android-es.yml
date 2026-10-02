@@ -53,7 +53,8 @@ jobs:
           printf 'sdk.dir=%s\n' "$ANDROID_HOME" > android/local.properties
       - name: Build APK and lint
         working-directory: android
-        run: ./gradlew --no-daemon --console=plain --max-workers=2 assembleRelease lintRelease
+        run: |
+          ./gradlew --no-daemon --console=plain --max-workers=2 assembleRelease lintRelease || { cat app/build/reports/lint-results-release.txt; exit 1; }
       - name: Sign and verify APK
         run: |
           set -euo pipefail
