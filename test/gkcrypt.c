@@ -20,6 +20,10 @@ static MunitResult test_ecdh(const MunitParameter params[], void *user)
 	if(err != CHIAKI_ERR_SUCCESS)
 		return MUNIT_ERROR;
 
+	#ifdef CHIAKI_LIB_ENABLE_MBEDTLS
+	munit_assert_int(mbedtls_ctr_drbg_reseed(&ecdh.drbg, NULL, 0), ==, 0);
+	#endif
+
 	err = chiaki_ecdh_set_local_key(&ecdh, local_private_key, sizeof(local_private_key), local_public_key, sizeof(local_public_key));
 	if(err != CHIAKI_ERR_SUCCESS)
 		return MUNIT_ERROR;
