@@ -167,7 +167,7 @@ class SettingsFragment : PreferenceFragmentCompat(), TitleFragment {
             ?.setOnPreferenceClickListener {
                 try {
                     val i = Intent(Intent.ACTION_VIEW)
-                    i.setData(Uri.parse("https://space.bilibili.com/16893379"))
+                    i.setData(Uri.parse("https://github.com/Axixi2233/chiaki-android"))
                     requireContext().startActivity(i)
                 } catch (e: Exception) {
                     e.printStackTrace()
