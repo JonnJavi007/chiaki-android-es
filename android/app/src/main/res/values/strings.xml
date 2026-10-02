@@ -18,7 +18,7 @@
     <string name="display_host_host">Dirección: %s</string>
     <string name="display_host_id_unregistered">ID: %s</string>
     <string name="display_host_id_registered">ID: %s (registrada)</string>
-    <string name="display_host_app_title_id">Aplicación: %s\nID del título: %s</string>
+    <string name="display_host_app_title_id">Aplicación: %1$s\nID del título: %2$s</string>
     <string name="action_register">Registrar consola</string>
     <string name="action_add_manual">Añadir consola manualmente</string>
     <string name="regist_pin_instructions_ps4_before">En la PS4, ve a</string>
@@ -53,7 +53,7 @@
     <string name="action_import_import">Importar</string>
     <string name="action_import_cancel">Cancelar</string>
     <string name="alert_title_import">Importar</string>
-    <string name="alert_message_import">Consolas registradas: %s\n\nConsolas añadidas manualmente: %s</string>
+    <string name="alert_message_import">Consolas registradas: %1$s\n\nConsolas añadidas manualmente: %2$s</string>
     <string name="alert_message_import_failed">No se pudieron importar los ajustes del archivo:\n%s</string>
     <string name="action_import_failed_ack">Cerrar</string>
     <string name="title_edit_manual">Consola añadida manualmente</string>
@@ -95,7 +95,7 @@
     <string name="preferences_motion_enabled_summary">Usar los sensores de movimiento del dispositivo</string>
     <string name="preferences_button_haptic_enabled_title">Vibración al tocar botones</string>
     <string name="preferences_button_haptic_enabled_summary">Usar el motor del dispositivo para vibrar al tocar los botones en pantalla</string>
-    <string name="alert_message_delete_registered_host">¿Quieres eliminar la consola registrada %s con ID %s?</string>
+    <string name="alert_message_delete_registered_host">¿Quieres eliminar la consola registrada %1$s con ID %2$s?</string>
     <string name="alert_message_delete_manual_host">¿Quieres eliminar la consola %s?</string>
     <string name="action_keep">Conservar</string>
     <string name="action_delete">Eliminar</string>
