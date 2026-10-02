@@ -26,8 +26,8 @@
     <string name="action_wakeup">唤醒</string>
     <string name="add_manual_regist_on_connect">在第一个连接上注册</string>
     <string name="alert_message_delete_manual_host">你确定要删除控制器条目吗 %s?</string>
-    <string name="alert_message_delete_registered_host" formatted="false">你确定要删除 ID 为 %s 的注册控制器 %s 吗？</string>
-    <string name="alert_message_import" formatted="false">"注册主机: %s手动注册主机: %s"</string>
+    <string name="alert_message_delete_registered_host">你确定要删除 ID 为 %1$s 的注册控制器 %2$s 吗？</string>
+    <string name="alert_message_import">"注册主机: %1$s手动注册主机: %2$s"</string>
     <string name="alert_message_import_failed">"无法从文件导入设置:
 %s"</string>
     <string name="alert_message_login_pin_request">登录 PIN 码：</string>
@@ -38,8 +38,8 @@
     <string name="alert_message_standby_wakeup">控制器当前处于待机模式，你想要发送唤醒数据包而不是立即尝试连接吗？</string>
     <string name="alert_regist_duplicate">MAC 已被 %s 的控制器已注册。之前的记录应该被覆盖吗？</string>
     <string name="alert_title_import">导入</string>
-    <string name="display_host_app_title_id" formatted="false">"App: %s
-名称 ID: %s"</string>
+    <string name="display_host_app_title_id">"App: %1$s
+名称 ID: %2$s"</string>
     <string name="display_host_host">地址: %s</string>
     <string name="display_host_id_registered">ID: %s (注册)</string>
     <string name="display_host_id_unregistered">ID: %s</string>
