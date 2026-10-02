@@ -29,19 +29,17 @@
         <SwitchPreference
             android:dependency="@string/preferences_rumble_enabled_key"
             app:key="@string/preferences_rumble_gamepad_enabled_key"
-            app:title="使用手柄震动"
+            app:title="@string/preferences_rumble_gamepad_title"
             android:defaultValue="false"
-            app:summary="如果安卓内核不支持手柄震动则使用默认手机自身震动马达。
-            \n也可以关闭此选项，启用 安卓系统-设置-语言与输入法-振动重定向功能 使手柄震动。"
+            app:summary="@string/preferences_rumble_gamepad_summary"
             app:icon="@drawable/icon_virtual_controller" />
 
         <SwitchPreference
             android:dependency="@string/preferences_rumble_enabled_key"
             app:key="@string/preferences_rumble_trigger_gamepad_enabled_key"
-            app:title="自适应扳机震动"
+            app:title="@string/preferences_rumble_trigger_title"
             android:defaultValue="false"
-            app:summary="开启此选项，游戏中自适应扳机的震动效果会使用手柄握把处的震动马达来模拟，
-            \n若手柄不支持震动，则使用默认手机自身震动马达。"
+            app:summary="@string/preferences_rumble_trigger_summary"
             app:icon="@drawable/icon_virtual_controller" />
 
         <SwitchPreference
@@ -122,18 +120,18 @@
 
     <PreferenceCategory
         app:key="category_axi"
-        app:title="阿西西的日常">
+        app:title="@string/preferences_category_title_extra">
 
         <SwitchPreference
             app:key="@string/preferences_screen_portrait_enabled_key"
-            app:title="强制竖屏显示画面"
-            app:summary="默认横屏显示，此选项可竖屏显示，会空余一半空间放置虚拟按钮。"
+            app:title="@string/preferences_screen_portrait_title"
+            app:summary="@string/preferences_screen_portrait_summary"
             app:icon="@drawable/icon_setting_portal" />
 
         <SwitchPreference
             app:key="@string/preferences_screen_cutoutmode_enabled_key"
-            app:title="填充刘海区域"
-            app:summary="默认不填充屏幕刘海区域\n(Android 9及以上)"
+            app:title="@string/preferences_screen_cutout_title"
+            app:summary="@string/preferences_screen_cutout_summary"
             app:icon="@drawable/icon_setting_cutout_mode" />
 
         <ListPreference
@@ -148,14 +146,14 @@
 
         <SwitchPreference
             app:key="@string/preferences_motion_vector_game_enabled_key"
-            app:title="使用游戏旋转矢量传感器"
-            app:summary="如果你的安卓掌机，发现体感不适配，建议勾选此选项，比如Ayaneo EVO"
+            app:title="@string/preferences_motion_vector_title"
+            app:summary="@string/preferences_motion_vector_summary"
             app:icon="@drawable/ic_motion" />
 
         <Preference
             app:key="@string/preferences_about_axixi_key"
-            app:title="关于阿西西的日常"
-            app:summary="点击会跳转到作者B站个人空间"
+            app:title="@string/preferences_about_axixi_title"
+            app:summary="@string/preferences_about_axixi_summary"
             app:icon="@drawable/icon_about_ax"/>
 
     </PreferenceCategory>
