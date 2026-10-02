@@ -371,7 +371,7 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 									android.os.Process.myUid()
 								)
 							if (lastNetDataNum != 0L) {
-								sb.append("带宽：")
+								sb.append(getString(R.string.stream_bandwidth))
 								val realtimeNetData: Float = (netData - lastNetDataNum) / 1024f
 								if (realtimeNetData >= 1000) {
 									sb.append(
@@ -393,8 +393,8 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 						sb.append("x")
 						sb.append(viewModel.session.connectInfo.videoProfile.height)
 						sb.append(if (viewModel.session.connectInfo.videoProfile.codec==Codec.CODEC_H265_HDR) " HDR" else "")
-						sb.append("\t 解码："+datas[1])
-						sb.append("\t FPS："+datas[2])
+						sb.append("\t " + getString(R.string.stream_decode) + datas[1])
+						sb.append("\t " + getString(R.string.stream_fps) + datas[2])
 						binding.fpsText.text=sb.toString()
 						return
 					}
@@ -484,9 +484,9 @@ class StreamActivity : AppCompatActivity(), View.OnSystemUiVisibilityChangeListe
 	}
 
 	override fun onBackPressed() {
-		val items = arrayOf("退出串流", "切换控件图层", "切换性能图层","取消")
+		val items = arrayOf(getString(R.string.stream_menu_quit), getString(R.string.stream_menu_controls), getString(R.string.stream_menu_performance), getString(R.string.action_connect_cancel_connect))
 		val builder =  MaterialAlertDialogBuilder(this)
-			builder.setTitle("操作菜单")  // 设置对话框标题
+			builder.setTitle(R.string.stream_menu_title)  // 设置对话框标题
 			.setItems(items) { dialog, which ->
 				// 用户选择的选项索引（which）
 				dialog.dismiss()
