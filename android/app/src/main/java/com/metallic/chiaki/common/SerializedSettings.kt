@@ -207,7 +207,7 @@ fun importSettingsFromUri(activity: Activity, uri: Uri, disposable: CompositeDis
 					if(it.isEmpty())
 						"-"
 					else
-						it.joinToString(separator = "") { host -> "\n - ${host.host} / ${host.serverMac ?: context.getString(R.string.host_unregistered)}" }
+						it.joinToString(separator = "") { host -> "\n - ${host.host} / ${host.serverMac ?: activity.getString(R.string.host_unregistered)}" }
 				}
 			))
 			.setTitle(R.string.alert_title_import)
