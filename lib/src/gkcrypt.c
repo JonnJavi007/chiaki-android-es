@@ -188,7 +188,7 @@ CHIAKI_EXPORT void chiaki_gkcrypt_gen_gmac_key(uint64_t index, const uint8_t *ke
 	// last param
 	// is224 Determines which function to use.
 	// This must be either 0 for SHA-256, or 1 for SHA-224.
-	mbedtls_sha256_ret(data, sizeof(data), md, 0);
+	mbedtls_sha256(data, sizeof(data), md, 0);
 #else
 	SHA256(data, 0x20, md);
 #endif
@@ -384,11 +384,6 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_gkcrypt_gmac(ChiakiGKCrypt *gkcrypt, uint64
 	}
 
 	// encrypt without additional data
-	if(mbedtls_gcm_starts(&actx, MBEDTLS_GCM_ENCRYPT, iv, CHIAKI_GKCRYPT_BLOCK_SIZE, NULL, 0) != 0)
-	{
-		mbedtls_gcm_free(&actx);
-		return CHIAKI_ERR_UNKNOWN;
-	}
 	// set "additional data" only whitout input nor output
 	// to get the same result as:
 	// EVP_EncryptUpdate(ctx, NULL, &len, buf, (int)buf_size)
