@@ -194,7 +194,6 @@ fun importSettingsFromUri(activity: Activity, uri: Uri, disposable: CompositeDis
 			throw IOException("Value of version is invalid")
 
 		val settings = adapter.fromJsonValue(settingsValue) ?: throw JsonDataException("Failed to parse Settings JSON")
-		Log.i("SerializedSettings", "would import: $settings")
 
 		MaterialAlertDialogBuilder(activity)
 			.setMessage(activity.getString(R.string.alert_message_import,
@@ -208,7 +207,7 @@ fun importSettingsFromUri(activity: Activity, uri: Uri, disposable: CompositeDis
 					if(it.isEmpty())
 						"-"
 					else
-						it.joinToString(separator = "") { host -> "\n - ${host.host} / ${host.serverMac ?: "unregistered"}" }
+						it.joinToString(separator = "") { host -> "\n - ${host.host} / ${host.serverMac ?: context.getString(R.string.host_unregistered)}" }
 				}
 			))
 			.setTitle(R.string.alert_title_import)
