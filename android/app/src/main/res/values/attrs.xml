@@ -21,10 +21,10 @@
     </declare-styleable>
 
     <string-array name="touch_key_names">
-        <item>无</item>
-        <item>音量上</item>
-        <item>音量下</item>
-        <item>G8手柄截图键（PS模式）</item>
+        <item>Ninguno</item>
+        <item>Subir volumen</item>
+        <item>Bajar volumen</item>
+        <item>Captura del mando G8 (modo PS)</item>
     </string-array>
     <string-array name="touch_key_values" translatable="false">
         <item>-1</item>
