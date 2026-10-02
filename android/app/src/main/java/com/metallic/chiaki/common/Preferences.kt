@@ -3,6 +3,7 @@
 package com.metallic.chiaki.common
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.SharedPreferences
 import androidx.annotation.StringRes
 import androidx.preference.PreferenceManager
@@ -58,6 +59,7 @@ class Preferences(context: Context)
 	}.also { sharedPreferences.registerOnSharedPreferenceChangeListener(it) }
 
 	private val resources = context.resources
+	private val television = (resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION
 
 	val discoveryEnabledKey get() = resources.getString(R.string.preferences_discovery_enabled_key)
 	var discoveryEnabled
@@ -66,7 +68,7 @@ class Preferences(context: Context)
 
 	val onScreenControlsEnabledKey get() = resources.getString(R.string.preferences_on_screen_controls_enabled_key)
 	var onScreenControlsEnabled
-		get() = sharedPreferences.getBoolean(onScreenControlsEnabledKey, true)
+		get() = sharedPreferences.getBoolean(onScreenControlsEnabledKey, !television)
 		set(value) { sharedPreferences.edit().putBoolean(onScreenControlsEnabledKey, value).apply() }
 
 	val touchpadOnlyEnabledKey get() = resources.getString(R.string.preferences_touchpad_only_enabled_key)
@@ -101,7 +103,7 @@ class Preferences(context: Context)
 
 	val motionEnabledKey get() = resources.getString(R.string.preferences_motion_enabled_key)
 	var motionEnabled
-		get() = sharedPreferences.getBoolean(motionEnabledKey, true)
+		get() = sharedPreferences.getBoolean(motionEnabledKey, !television)
 		set(value) { sharedPreferences.edit().putBoolean(motionEnabledKey, value).apply() }
 
 	val motionGamePadEnabledKey get() = resources.getString(R.string.preferences_motion_gamepad_enabled_key)
